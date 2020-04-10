@@ -2,7 +2,7 @@
   $dbname = "shop"; 
   $host = 'localhost';
   $user = 'staff';
-  $psw =  'password';
+  $psw =  'Wert3333-';
     $mydb = 'mysql:dbname='.$dbname.';host='.$host.';charset=utf8';
   try{
     $pdo=new PDO($mydb,$user,$psw ); //DBへ接続
