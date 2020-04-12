@@ -5,7 +5,9 @@ require 'menu.php';
 
 unset($_SESSION['customer']);
 
-http://192.168.17.104/chap7/customer-input.php
+$sql=$pdo->prepare('select * from customer where login=? ');
+$sql->execute([$_REQUEST['login'] ]);
+
 foreach ($sql as $row) {
 	$_SESSION['customer']=[
 		'id'=>$row['id'], 'name'=>$row['name'], 
