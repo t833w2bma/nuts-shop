@@ -1,5 +1,5 @@
 <?php session_start(); 
- require '../header.php'; 
+ require './header.php'; 
  require 'menu.php'; 
  require 'connect.php'; 
 
@@ -46,4 +46,4 @@ if (isset($_SESSION['customer']['name'] ,$_SESSION['customer']['address'], $_SES
 	<input type="submit" value="確定">
 </form>
 
-<?php require '../footer.php' ?>
+<?php require './footer.php' ?>

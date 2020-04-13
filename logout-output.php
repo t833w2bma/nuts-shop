@@ -1,6 +1,6 @@
 <?php 
  session_start(); 
- require '../header.php';  
+ require './header.php';  
 
 if (isset($_SESSION['customer'])) {
 	unset($_SESSION['customer']);
@@ -12,5 +12,5 @@ if (isset($_SESSION['customer'])) {
  require 'menu.php'; 
 	echo $output;
 
- require '../footer.php'; 
+ require './footer.php'; 
  

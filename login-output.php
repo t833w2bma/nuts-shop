@@ -1,5 +1,5 @@
 <?php session_start();  
-require '../header.php';
+require './header.php';
  require 'connect.php'; 
 
 unset($_SESSION['customer']);
@@ -25,4 +25,4 @@ if (password_verify( $_POST['password'], $row[0]['password'] )) {
 	require 'menu.php';
 	echo $output;
 ?>
-<?php require '../footer.php'; ?>
+<?php require './footer.php'; ?>
