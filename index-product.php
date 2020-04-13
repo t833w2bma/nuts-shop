@@ -1,5 +1,5 @@
 <?php 
- require '../header.php'; 
+ require './header.php'; 
  require 'menu.php';
  require 'connect.php'; 
 ?>
@@ -32,4 +32,4 @@ echo '<div class="products">';
 	}
 	?>
 </div> <!--product-->
-<?php require '../footer.php'; ?>
+<?php require './footer.php'; ?>

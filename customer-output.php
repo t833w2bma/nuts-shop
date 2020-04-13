@@ -1,6 +1,6 @@
 <?php 
 session_start(); 
-require '../header.php';
+require './header.php';
  require 'menu.php';
 	require 'connect.php'; 
  
