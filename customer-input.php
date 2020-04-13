@@ -6,7 +6,8 @@
  $error_message =  '<p><a href="/chap7/customer-input-tmp.php">こちらからemailを送信してください。</a></p>';
  if( empty($_GET['email']) || empty($_GET['token'])){
   echo  $error_message;
-  exit;
+	exit;
+	
  }else{
 // 取得したemailとtokenで仮登録テーブルを絞り込んで、1件あれば認証
 	$sql=$pdo->prepare('select * from customer_tmp where email=? and token=?');
@@ -18,7 +19,7 @@
 		$_SESSION['customer']['email'] = htmlspecialchars( $_GET['email'],ENT_QUOTES);
  }
 
-$name=$address=$login=$password=''; 
+$name=$address=$login=$password=''; // 全部にカラ文字を代入して初期化する
 if (isset($_SESSION['customer']['name'] ,$_SESSION['customer']['address'], $_SESSION['customer']['login'])) { // 3つともあったらに変える
 	$name=$_SESSION['customer']['name'];
 	$address=$_SESSION['customer']['address'];
