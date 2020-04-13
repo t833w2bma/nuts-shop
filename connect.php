@@ -1,8 +1,8 @@
 <?php
   $dbname = "shop"; 
   $host = 'localhost';
-  $user = 'staff';
-  $psw =  'Wert3333-';
+  $user = 'ginzo';
+  $psw =  'Hjkl344300-';
     $mydb = 'mysql:dbname='.$dbname.';host='.$host.';charset=utf8';
   try{
     $pdo=new PDO($mydb,$user,$psw ); //DBへ接続

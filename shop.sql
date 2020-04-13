@@ -1,6 +1,6 @@
 drop database if exists shop;
 create database shop default character set utf8 collate utf8_general_ci;
-grant all on shop.* to 'staff'@'localhost' identified by 'password';
+grant all on shop.* to 'ginzo'@'localhost' identified by 'Hjkl344300-';
 use shop;
 
 create table product (

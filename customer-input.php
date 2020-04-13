@@ -4,7 +4,7 @@
  require 'connect.php'; 
 
  if( empty($_GET['email']) || empty($_GET['token'])){
-  echo '<p><a href="http://192.168.17.104/chap7/customer-input_tmp.php">こちらからemailを送信してください。</a></p>'; 
+  echo '<p><a href="/chap7/customer-input-tmp.php">こちらからemailを送信してください。</a></p>'; 
   exit;
  }else{
 
