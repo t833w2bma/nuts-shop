@@ -2,8 +2,8 @@
 if (isset($_SESSION['customer'])) {
 	echo '<table>';
 	echo '<th>商品番号</th><th>商品名</th><th>価格</th>';
-	$pdo=new PDO('mysql:host=localhost;dbname=shop;charset=utf8', 
-		'staff', 'password');
+	require 'connect.php'; 
+	
 	$sql=$pdo->prepare(
 		'select * from favorite, product '.
 		'where customer_id=? and product_id=id');

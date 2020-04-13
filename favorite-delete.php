@@ -3,8 +3,8 @@
 <?php require 'menu.php'; ?>
 <?php
 if (isset($_SESSION['customer'])) {
-	$pdo=new PDO('mysql:host=localhost;dbname=shop;charset=utf8', 
-		'staff', 'password');
+	require 'connect.php'; 
+	
 	$sql=$pdo->prepare(
 		'delete from favorite where customer_id=? and product_id=?');
 	$sql->execute([$_SESSION['customer']['id'], $_REQUEST['id']]);
