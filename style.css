@@ -11,3 +11,10 @@ a {
 	width: 20px;    height: 20px;
 }
 .product-image img{width: 25%;}
+
+.customer-name{position: absolute; right: 0; padding-right: 1em;}
+.memnunav{position: relative;}
+
+.products{display: flex;flex-wrap:wrap}
+.product{padding: 15px 25px; width:25% ; box-sizing: border-box;}
+.product .img img{width: 100%;}

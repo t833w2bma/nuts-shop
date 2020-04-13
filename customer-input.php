@@ -12,8 +12,9 @@
 	$sql=$pdo->prepare('select * from customer_tmp where email=? and token=?');
 	$sql->execute([ $_GET['email'], $_GET['token'] ]);
 	$row = $sql->fetchAll();
-	if( empty($row)) exit(  $error_message ); // 一件もなければ処理を中断
-
+	if( empty($row) || time() - strtotime ($row[0]['created']) > 3600 * 24 )
+	 exit(  $error_message ); 
+	// 一件もないか 24時間以上経過していたら処理を中断
 		$_SESSION['customer']['email'] = htmlspecialchars( $_GET['email'],ENT_QUOTES);
  }
 

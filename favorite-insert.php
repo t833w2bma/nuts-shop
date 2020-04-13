@@ -1,10 +1,9 @@
-<?php session_start(); ?>
-<?php require '../header.php'; ?>
-<?php require 'menu.php'; ?>
-<?php
+<?php session_start(); 
+ require '../header.php'; 
+ require 'menu.php'; 
+ require 'connect.php'; 
+
 if (isset($_SESSION['customer'])) {
-	$pdo=new PDO('mysql:host=localhost;dbname=shop;charset=utf8', 
-		'staff', 'password');
 	$sql=$pdo->prepare('insert into favorite values(?,?)');
 	$sql->execute([$_SESSION['customer']['id'], $_REQUEST['id']]);
 	echo 'お気に入りに商品を追加しました。';

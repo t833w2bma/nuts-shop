@@ -1,6 +1,5 @@
 <?php session_start();  
 require '../header.php';
-require 'menu.php';
  require 'connect.php'; 
 
 unset($_SESSION['customer']);
@@ -17,9 +16,11 @@ foreach ($sql as $row) {
  
 if (password_verify( $_POST['password'], $_SESSION['customer']['password'] )) {
 	//この関数でハッシュ化したパスワードと照合し正しければtrueが返される
-	echo 'いらっしゃいませ、', $_SESSION['customer']['name'], 'さん。';
+	$output = '<p>いらっしゃいませ、'. $_SESSION['customer']['name']. 'さん。';
 } else {
-	echo 'ログイン名またはパスワードが違います。';
+	$output = '<p>ログイン名またはパスワードが違います。';
 }
+	require 'menu.php';
+	echo $output;
 ?>
 <?php require '../footer.php'; ?>
