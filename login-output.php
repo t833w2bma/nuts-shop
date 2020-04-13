@@ -11,7 +11,7 @@ $row = $sql->fetchAll();
 if (password_verify( $_POST['password'], $row[0]['password'] )) {
 	//この関数でハッシュ化したパスワードと照合し正しければtrueが返される
 	
-	// 	ログイン名で引き当てた1行から列を取り出してセッションに入れる
+	//ログイン名で引き当てた1行から列を取り出してセッションに入れる
 		$_SESSION['customer']=[	'id'=>$row[0]['id']
 		, 'name'=>$row[0]['name']
 		,	'address'=>$row[0]['address']
