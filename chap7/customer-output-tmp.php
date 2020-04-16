@@ -8,6 +8,8 @@ require 'menu.php';
   exit;
  }
 
+ date_default_timezone_set('Asia/Tokyo');
+ 
  if(preg_match('/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/iD', $_POST['email'])){
  //トークン発行 
   $token = random(25);

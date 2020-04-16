@@ -2,6 +2,10 @@
  require './header.php'; 
  require 'menu.php'; 
  require 'connect.php'; 
+ 
+ 
+ date_default_timezone_set("Asia/Tokyo"); //タイムゾーンを東京に設定
+
 
  $error_message =  '<p><a href="/chap7/customer-input-tmp.php">こちらからemailを送信してください。</a></p>';
  if( empty($_GET['email']) || empty($_GET['token'])){
@@ -13,6 +17,14 @@
 	$sql=$pdo->prepare('select * from customer_tmp where email=? and token=?');
 	$sql->execute([ $_GET['email'], $_GET['token'] ]);
 	$row = $sql->fetchAll();
+
+ // 試しに出してみる
+ echo time() , PHP_EOL;
+echo '<p>', date('Y-m-d H:i:s',time());
+echo '<p>', date('Y-m-d H:i:s', strtotime ($row[0]['created']));
+echo '<p>', time() - strtotime ($row[0]['created']);
+echo '<p>', ( time() - strtotime ($row[0]['created']) ) /3600 ;
+
 	if( empty($row) || time() - strtotime ($row[0]['created']) > 3600 * 24 )
 	 exit(  $error_message ); 
 	// 一件もないか 24時間以上経過していたら処理を中断
