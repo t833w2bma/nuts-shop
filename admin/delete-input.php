@@ -1,5 +1,5 @@
-<?php require '../header.php';
- require 'connect.php'; 
+<?php require 'header.php';
+ require '../connect.php'; 
   ?>
 <table>
 <tr><th>商品番号</th><th>商品名</th><th>商品価格</th></tr>

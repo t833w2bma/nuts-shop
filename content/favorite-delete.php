@@ -3,7 +3,7 @@
 <?php require 'menu.php'; ?>
 <?php
 if (isset($_SESSION['customer'])) {
-	require 'connect.php'; 
+	require '../connect.php'; 
 	
 	$sql=$pdo->prepare(
 		'delete from favorite where customer_id=? and product_id=?');

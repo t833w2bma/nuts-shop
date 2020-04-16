@@ -1,7 +1,7 @@
 <?php session_start();  
  require './header.php';
  require 'menu.php';
- require 'connect.php'; 
+ require '../connect.php'; 
 
 $sql=$pdo->prepare('select * from product where id=?');
 $sql->execute([$_REQUEST['id']]);

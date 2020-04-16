@@ -1,6 +1,6 @@
 <?php session_start(); require './header.php';
  require 'menu.php';
-	require 'connect.php'; 
+	require '../connect.php'; 
  
 $purchase_id=1;
 foreach ($pdo->query('select max(id) from purchase') as $row) {

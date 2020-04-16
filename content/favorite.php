@@ -2,7 +2,7 @@
 if (isset($_SESSION['customer'])) {
 	echo '<table>';
 	echo '<th>商品番号</th><th>商品名</th><th>価格</th>';
-	require 'connect.php'; 
+	require '../connect.php'; 
 	
 	$sql=$pdo->prepare(
 		'select * from favorite, product '.

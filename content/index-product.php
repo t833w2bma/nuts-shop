@@ -1,7 +1,7 @@
 <?php 
  require './header.php'; 
  require 'menu.php';
- require 'connect.php'; 
+ require '../connect.php'; 
 ?>
 <form action="product.php" method="post">
 商品検索

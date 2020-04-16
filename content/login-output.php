@@ -1,6 +1,6 @@
 <?php session_start();  
 require './header.php';
- require 'connect.php'; 
+ require '../connect.php'; 
 
 unset($_SESSION['customer']);
 

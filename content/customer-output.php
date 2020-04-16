@@ -2,7 +2,7 @@
 session_start(); 
 require './header.php';
  require 'menu.php';
-	require 'connect.php'; 
+	require '../connect.php'; 
  
 if (isset($_SESSION['customer']['id'])) {
 	$id=$_SESSION['customer']['id'];

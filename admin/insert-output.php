@@ -1,5 +1,5 @@
-<?php require '../header.php';
- require 'connect.php';  
+<?php require 'header.php';
+ require '../connect.php';  
 
  $name=htmlspecialchars($_POST['name'],ENT_QUOTES);
  $price=htmlspecialchars($_POST['price'],ENT_QUOTES);

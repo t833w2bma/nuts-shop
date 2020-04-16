@@ -1,7 +1,7 @@
 <?php session_start(); 
  require './header.php'; 
  require 'menu.php'; 
- require 'connect.php'; 
+ require '../connect.php'; 
  
  
  date_default_timezone_set("Asia/Tokyo"); //タイムゾーンを東京に設定

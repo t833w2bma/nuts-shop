@@ -1,6 +1,6 @@
 <?php
- require '../header.php';  
- require 'connect.php';  
+ require 'header.php';  
+ require '../connect.php';  
 
 $sql = 'select * from product where name NOT LIKE "%ナッツ%"
 ORDER BY price DESC ';

@@ -1,7 +1,7 @@
 <?php
 require './header.php';
 require 'menu.php';
- require 'connect.php'; 
+ require '../connect.php'; 
 
  if( empty($_POST['email'])){
   echo 'emailを送信してください。'; 
