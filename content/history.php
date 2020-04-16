@@ -1,10 +1,10 @@
 <?php session_start(); ?>
 <?php require './header.php'; ?>
-<?php require 'menu.php'; ?>
-<?php
+<?php require 'menu.php'; 	
+require '../connect.php'; 
+
 if (isset($_SESSION['customer'])) {
-	$pdo=new PDO('mysql:host=localhost;dbname=shop;charset=utf8', 
-		'staff', 'password');
+
 	$sql_purchase=$pdo->prepare(
 		'select * from purchase where customer_id=? order by id desc');
 	$sql_purchase->execute([$_SESSION['customer']['id']]);
@@ -38,4 +38,4 @@ if (isset($_SESSION['customer'])) {
 	echo '購入履歴を表示するには、ログインしてください。';
 }
 ?>
-<?php require '../footer.php'; ?>
+<?php require 'footer.php'; ?>

@@ -1,4 +1,5 @@
-<?php session_start();  
+<?php  
+if(empty($_GET['purchase_id'])) exit('URLパラメータがありません');
 require 'header.php';
  require '../connect.php'; 
 

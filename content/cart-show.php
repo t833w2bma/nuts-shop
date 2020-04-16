@@ -4,4 +4,4 @@
 <?php
 require 'cart.php';
 ?>
-<?php require '../footer.php'; ?>
+<?php require 'footer.php'; ?>

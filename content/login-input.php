@@ -5,4 +5,4 @@
 パスワード<input type="password" name="password"><br>
 <input type="submit" value="ログイン">
 </form>
-<?php require '../footer.php'; ?>
+<?php require 'footer.php'; ?>

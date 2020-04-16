@@ -1,7 +1,7 @@
 <?php session_start(); 
  require './header.php'; 
  require 'menu.php'; 
- require 'connect.php'; 
+ require '../connect.php'; 
 
 if (isset($_SESSION['customer'])) {
 	$sql=$pdo->prepare('insert into favorite values(?,?)');
@@ -13,4 +13,4 @@ if (isset($_SESSION['customer'])) {
 	echo 'お気に入りに商品を追加するには、ログインしてください。';
 }
 ?>
-<?php require '../footer.php'; ?>
+<?php require 'footer.php'; ?>

@@ -57,4 +57,4 @@ $href =  $record ? 'delete' : 'insert';
 </form>
 
 
-<?php require '../footer.php'; ?>
+<?php require 'footer.php'; ?>

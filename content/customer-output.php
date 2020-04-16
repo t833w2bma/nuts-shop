@@ -53,4 +53,4 @@ if (empty($sql->fetchAll())) {  //重複したログイン名はない
 	echo 'ログイン名がすでに使用されていますので、変更してください。';
 }
 ?>
-<?php require '../footer.php'; ?>
+<?php require 'footer.php'; ?>

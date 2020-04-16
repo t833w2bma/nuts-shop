@@ -17,4 +17,4 @@ if (empty($_SESSION['product'])) {
 	echo '<a href="purchase-output.php">購入を確定する</a>';
 }
 ?>
-<?php require '../footer.php'; ?>
+<?php require 'footer.php'; ?>

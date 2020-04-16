@@ -15,4 +15,4 @@ if (isset($_SESSION['customer'])) {
 }
 require 'favorite.php';
 ?>
-<?php require '../footer.php'; ?>
+<?php require 'footer.php'; ?>
