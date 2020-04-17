@@ -1,9 +1,9 @@
 <?php  
-if(empty($_GET['purchase_id'])) exit('URLパラメータがありません');
+if(empty($_GET['purchase_id'])) exit('URLパラメータがありません ?purchase_id=9');
 require 'header.php';
  require '../connect.php'; 
 
- $sql = 'SELECT p.id,name,address 
+ $sql = 'SELECT p.id,name,address,`created` 
  FROM purchase as p 
  LEFT JOIN customer as c 
  ON p.customer_id=c.id 
@@ -12,10 +12,10 @@ require 'header.php';
 $stmt=$pdo->prepare( $sql );
 $stmt->execute([ $_GET['purchase_id']]);
 $row = $stmt->fetchAll();
-var_dump($row);
 echo "<p> {$row[0]['id']}";
 echo "<p> {$row[0]['name']}";
 echo "<p> {$row[0]['address']}";
+echo "<p> {$row[0]['created']}";
 
 $sql = 'SELECT d.product_id,name ,price,count
  ,count * price as shokei
@@ -26,7 +26,11 @@ $sql = 'SELECT d.product_id,name ,price,count
 
 $stmt=$pdo->prepare( $sql );
 $stmt->execute([ $_GET['purchase_id']]);
+
+echo '<table border="1">';
 foreach ($stmt as $row) {
-  echo '<p>',$row['product_id'] ,$row['name']
-  , $row['price'] , $row['count'] , $row['shokei'] ;
+  echo "<tr> <td>{$row['product_id']}</td> <td>{$row['name']}</td>
+   <td>{$row['price']}</td> <td>{$row['count']}</td>  <td>{$row['shokei']}</td> </tr>
+  ";
 }
+echo '</table>';
