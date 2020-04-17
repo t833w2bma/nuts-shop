@@ -1,6 +1,8 @@
 <?php  
-if(empty($_GET['purchase_id'])) exit('URLパラメータがありません ?purchase_id=9');
-require 'header.php';
+if(empty($_GET['purchase_id']))
+ exit('URLパラメータがありません ?purchase_id=2');
+
+ require 'header.php';
  require '../connect.php'; 
 
  $sql = 'SELECT p.id,name,address,`created` 
@@ -12,10 +14,10 @@ require 'header.php';
 $stmt=$pdo->prepare( $sql );
 $stmt->execute([ $_GET['purchase_id']]);
 $row = $stmt->fetchAll();
-echo "<p> {$row[0]['id']}";
-echo "<p> {$row[0]['name']}";
-echo "<p> {$row[0]['address']}";
-echo "<p> {$row[0]['created']}";
+echo "<li> {$row[0]['id']}"
+ ,"<li> {$row[0]['name']}"
+ ,"<li> {$row[0]['address']}"
+ ,"<li> {$row[0]['created']}";
 
 $sql = 'SELECT d.product_id,name ,price,count
  ,count * price as shokei
