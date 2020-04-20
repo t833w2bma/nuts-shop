@@ -2,6 +2,7 @@
 /* CAT:Bar Chart */
 
 /* pChart library inclusions */
+require_once("../connect.php");
 require_once("./bootstrap.php");
 
 use pChart\pColor;
@@ -12,11 +13,24 @@ use pChart\pCharts;
 $x = 900 ; $y = 330;
 $myPicture = new pDraw($x,$y);
 
+//
+$sql = "SELECT DATE_FORMAT(created,'%Y%m') as `Y-M` , count(*) as count
+FROM `purchase`
+GROUP BY `Y-M`
+ORDER BY `Y-M` ";
+$stmt=$pdo->prepare($sql);
+$stmt->execute();
+
+$ym = []; $count =[];
+foreach( $stmt as $row){
+  $ym[] = $row['Y-M'];
+  $count[] = $row['count'];
+}
 /* Populate the pData object */
-$myPicture->myData->addPoints([150,220,300,-250,-420,-200,300,200,100],"Server A");
-$myPicture->myData->addPoints([140,0,340,-300,-320,399,200,100,50],"Server B");
+$myPicture->myData->addPoints($count,"Server A");
+// $myPicture->myData->addPoints([140,0,340,-300,-320,399,200,100,50],"Server B");
 $myPicture->myData->setAxisName(0,"Hits");
-$myPicture->myData->addPoints(["Jan","Feb","Mar","Apr","May","June","July","Aug","Sep"],"Months");
+$myPicture->myData->addPoints($ym,"Months");
 $myPicture->myData->setSerieDescription("Months","Month");
 $myPicture->myData->setAbscissa("Months");
 

@@ -2,10 +2,10 @@
 /*
 pBubble - class to draw bubble charts
 
-Version     : 2.3.0-dev
+Version     : 2.4.0-dev
 Made by     : Jean-Damien POGOLOTTI
 Maintainedby: Momchil Bozhinov
-Last Update : 01/02/2018
+Last Update : 01/09/2019
 
 This file can be distributed under the license you can find at:
 http://www.pchart.net/license
@@ -21,7 +21,7 @@ define("BUBBLE_SHAPE_SQUARE", 700002);
 /* pBubble class definition */
 class pBubble
 {
-	var $myPicture;
+	private $myPicture;
 
 	function __construct(\pChart\pDraw $pChartObject)
 	{
@@ -29,7 +29,7 @@ class pBubble
 	}
 
 	/* Prepare the scale */
-	function bubbleScale(array $DataSeries, array $WeightSeries)
+	public function bubbleScale(array $DataSeries, array $WeightSeries)
 	{
 		/* Parse each data series to find the new min & max boundaries to scale */
 		$NewPositiveSerie = [];
@@ -42,7 +42,7 @@ class pBubble
 
 		foreach($DataSeries as $idx => $SerieName) {
 			$SerieWeightName = $WeightSeries[$idx];
-			$this->myPicture->myData->setSerieDrawable($SerieWeightName, FALSE);
+			$this->myPicture->myData->setSerieProperties($SerieWeightName,["isDrawable" => FALSE]);
 			if (count($Data["Series"][$SerieName]["Data"]) > $MaxValues) {
 				$MaxValues = count($Data["Series"][$SerieName]["Data"]);
 			}
@@ -96,7 +96,7 @@ class pBubble
 	}
 
 	/* Prepare the scale */
-	function drawBubbleChart(array $DataSeries, array $WeightSeries, array $Format = [])
+	public function drawBubbleChart(array $DataSeries, array $WeightSeries, array $Format = [])
 	{
 		$ForceAlpha = NULL;
 		$DrawBorder = TRUE;
@@ -104,7 +104,6 @@ class pBubble
 		$Shape = BUBBLE_SHAPE_ROUND;
 		$Surrounding = NULL;
 		$BorderColor = new pColor(0,0,0,30);
-		$RecordImageMap = FALSE;
 
 		/* Override defaults */
 		extract($Format);
@@ -116,30 +115,32 @@ class pBubble
 		$Data = $Data["Series"];
 
 		if (isset($Data["BubbleFakePositiveSerie"])) {
-			$this->myPicture->myData->setSerieDrawable("BubbleFakePositiveSerie", FALSE);
+			$this->myPicture->myData->setSerieProperties("BubbleFakePositiveSerie",["isDrawable" => FALSE]);
 		}
 
 		if (isset($Data["BubbleFakeNegativeSerie"])) {
-			$this->myPicture->myData->setSerieDrawable("BubbleFakeNegativeSerie", FALSE);
+			$this->myPicture->myData->setSerieProperties("BubbleFakeNegativeSerie",["isDrawable" => FALSE]);
 		}
 
-		$this->myPicture->myData->resetSeriesColors();
 		list($XMargin, $XDivs) = $this->myPicture->myData->scaleGetXSettings();
-		
+
 		if ($XDivs == 0) {
 			$XStep = 0;
 		} else {
+			list($Xdiff, $Ydiff) = $this->myPicture->getGraphAreaDiffs();
 			if ($Orientation == SCALE_POS_LEFTRIGHT) {
-				$XStep = ($this->myPicture->GraphAreaXdiff - $XMargin * 2) / $XDivs;
+				$XStep = ($Xdiff - $XMargin * 2) / $XDivs;
 			} elseif ($Orientation == SCALE_POS_TOPBOTTOM) {
-				$XStep = ($this->myPicture->GraphAreaYdiff - $XMargin * 2) / $XDivs;
+				$XStep = ($Ydiff - $XMargin * 2) / $XDivs;
 			}
 		}
 
+		$GraphAreaCoordinates = $this->myPicture->getGraphAreaCoordinates();
+
 		foreach($DataSeries as $Key => $SerieName) {
 
-			$X = $this->myPicture->GraphAreaX1 + $XMargin;
-			$Y = $this->myPicture->GraphAreaY1 + $XMargin;
+			$X = $GraphAreaCoordinates["L"] + $XMargin;
+			$Y = $GraphAreaCoordinates["T"] + $XMargin;
 
 			$ColorSettings = ["Color" => $Palette[$Key]];
 
@@ -158,11 +159,6 @@ class pBubble
 				}
 			}
 
-			if ($RecordImageMap) {
-				$SerieDescription = (isset($Data[$SerieName]["Description"])) ? $Data[$SerieName]["Description"] : $SerieName;
-				$ImageMapColor = $ColorSettings["Color"]->toHex();
-			}
-
 			foreach($Data[$SerieName]["Data"] as $iKey => $Point) {
 
 				$DataWeightSeries = $Data[$WeightSeries[$Key]]["Data"][$iKey];
@@ -174,11 +170,9 @@ class pBubble
 
 					$Y = floor($Pos);
 					if ($Shape == BUBBLE_SHAPE_SQUARE) {
-						($RecordImageMap) AND $this->myPicture->addToImageMap("RECT", floor($X - $Radius).",".floor($Y - $Radius).",".floor($X + $Radius).",".floor($Y + $Radius), $ImageMapColor, $SerieDescription, $DataWeightSeries);
 						($BorderWidth != 1) AND	$this->myPicture->drawFilledRectangle($X - $Radius - $BorderWidth, $Y - $Radius - $BorderWidth, $X + $Radius + $BorderWidth, $Y + $Radius + $BorderWidth, $BorderColorSettings);
 						$this->myPicture->drawFilledRectangle($X - $Radius, $Y - $Radius, $X + $Radius, $Y + $Radius, $ColorSettings);
 					} elseif ($Shape == BUBBLE_SHAPE_ROUND) {
-						($RecordImageMap) AND $this->myPicture->addToImageMap("CIRCLE", floor($X).",".floor($Y).",".floor($Radius), $ImageMapColor, $SerieDescription, $DataWeightSeries);
 						($BorderWidth != 1) AND	$this->myPicture->drawFilledCircle($X, $Y, $Radius + $BorderWidth, $BorderColorSettings);
 						$this->myPicture->drawFilledCircle($X, $Y, $Radius, $ColorSettings);
 					}
@@ -189,11 +183,9 @@ class pBubble
 
 					$X = floor($Pos);
 					if ($Shape == BUBBLE_SHAPE_SQUARE) {
-						($RecordImageMap) AND $this->myPicture->addToImageMap("RECT", floor($X - $Radius).",".floor($Y - $Radius).",".floor($X + $Radius).",".floor($Y + $Radius), $ImageMapColor, $SerieDescription, $DataWeightSeries);
 						($BorderWidth != 1) AND	$this->myPicture->drawFilledRectangle($X - $Radius - $BorderWidth, $Y - $Radius - $BorderWidth, $X + $Radius + $BorderWidth, $Y + $Radius + $BorderWidth, $BorderColorSettings);
 						$this->myPicture->drawFilledRectangle($X - $Radius, $Y - $Radius, $X + $Radius, $Y + $Radius, $ColorSettings);
 					} elseif ($Shape == BUBBLE_SHAPE_ROUND) {
-						($RecordImageMap) AND $this->myPicture->addToImageMap("CIRCLE", floor($X).",".floor($Y).",".floor($Radius), $ImageMapColor, $SerieDescription, $DataWeightSeries);
 						($BorderWidth != 1) AND	$this->myPicture->drawFilledCircle($X, $Y, $Radius + $BorderWidth, $BorderColorSettings);
 						$this->myPicture->drawFilledCircle($X, $Y, $Radius, $ColorSettings);
 					}
@@ -204,7 +196,7 @@ class pBubble
 		}
 	}
 
-	function writeBubbleLabel(string $SerieName, string $SerieWeightName, int $Point, array $Format = [])
+	public function writeBubbleLabel(string $SerieName, string $SerieWeightName, int $Point, array $Format = [])
 	{
 		$Data = $this->myPicture->myData->getData();
 
@@ -217,20 +209,23 @@ class pBubble
 		$AxisID = $Data["Series"][$SerieName]["Axis"];
 		$Value = $Data["Series"][$SerieName]["Data"][$Point];
 		$Pos = $this->myPicture->scaleComputeYSingle($Value, $AxisID);
-		$Value = $this->myPicture->scaleFormat($Value, $Data["Axis"][$AxisID]["Display"], $Data["Axis"][$AxisID]["Format"], $Data["Axis"][$AxisID]["Unit"]);
+		$Value = $this->myPicture->scaleFormat($Value, $Data["Axis"][$AxisID]);
 		$Description = (isset($Data["Series"][$SerieName]["Description"])) ? $Data["Series"][$SerieName]["Description"] : "No description";
 		$Abscissa = (isset($Data["Abscissa"]) && isset($Data["Series"][$Data["Abscissa"]]["Data"][$Point])) ? $Data["Series"][$Data["Abscissa"]]["Data"][$Point]." : " : "";
-		$Series = ["Format" => $Data["Series"][$SerieName]["Color"],"Caption" => $Abscissa . $Value . " / " . $Data["Series"][$SerieWeightName]["Data"][$Point]];
+		$Series = ["Color" => $Data["Series"][$SerieName]["Color"],"Caption" => $Abscissa . $Value . " / " . $Data["Series"][$SerieWeightName]["Data"][$Point]];
 
-		$X = $this->myPicture->GraphAreaX1 + $XMargin;
-		$Y = $this->myPicture->GraphAreaY1 + $XMargin;
+		$GraphAreaCoordinates = $this->myPicture->getGraphAreaCoordinates();
+		$X = $GraphAreaCoordinates["L"] + $XMargin;
+		$Y = $GraphAreaCoordinates["T"] + $XMargin;
+
+		list($Xdiff, $Ydiff) = $this->myPicture->getGraphAreaDiffs();
 
 		if ($Data["Orientation"] == SCALE_POS_LEFTRIGHT) {
-			$XStep = ($XDivs == 0) ? 0 : ($this->myPicture->GraphAreaXdiff - $XMargin * 2) / $XDivs;
+			$XStep = ($XDivs == 0) ? 0 : ($Xdiff - $XMargin * 2) / $XDivs;
 			$X = floor($X + $Point * $XStep);
 			$Y = floor($Pos);
 		} else {
-			$YStep = ($XDivs == 0) ? 0 :($this->myPicture->GraphAreaYdiff - $XMargin * 2) / $XDivs;
+			$YStep = ($XDivs == 0) ? 0 : ($Ydiff - $XMargin * 2) / $XDivs;
 			$X = floor($Pos);
 			$Y = floor($Y + $Point * $YStep);
 		}
@@ -245,5 +240,3 @@ class pBubble
 		$this->myPicture->drawLabelBox($X, $Y - 3, $Description, $Series, $Format);
 	}
 }
-
-?>

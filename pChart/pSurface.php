@@ -2,10 +2,10 @@
 /*
 pSurface - class to draw surface charts
 
-Version     : 2.3.0-dev
+Version     : 2.4.0-dev
 Made by     : Jean-Damien POGOLOTTI
 Maintainedby: Momchil Bozhinov
-Last Update : 01/02/2018
+Last Update : 01/09/2019
 
 This file can be distributed under the license you can find at:
 http://www.pchart.net/license
@@ -25,10 +25,10 @@ define("LABEL_POSITION_BOTTOM", 880004);
 /* pStock class definition */
 class pSurface
 {
-	var $GridSizeX;
-	var $GridSizeY;
-	var $Points = [];
-	var $myPicture;
+	private $GridSizeX;
+	private $GridSizeY;
+	private $Points = [];
+	private $myPicture;
 
 	function __construct(\pChart\pDraw $pChartObject)
 	{
@@ -36,29 +36,23 @@ class pSurface
 	}
 
 	/* Define the grid size and initialize the 2D matrix */
-	function setGrid(int $XSize = 10, int $YSize = 10)
+	public function setGrid(int $XSize = 10, int $YSize = 10)
 	{
-		for ($X = 0; $X <= $XSize; $X++) {
-			for ($Y = 0; $Y <= $YSize; $Y++) {
-				$this->Points[$X][$Y] = UNKNOWN;
-			}
-		}
+		$this->Points = array_fill(0, $XSize + 1, array_fill(0, $YSize + 1, UNKNOWN));
 
 		$this->GridSizeX = $XSize;
 		$this->GridSizeY = $YSize;
 	}
 
 	/* Add a point on the grid */
-	function addPoint(int $X, int $Y, $Value, $Force = TRUE)
+	public function addPoint(int $X, int $Y, $Value, $Force = TRUE)
 	{
 		if ($X < 0 || $X > $this->GridSizeX) {
-			return;
-			#throw pException::SurfaceInvalidInputException("Point out of range");
+			throw pException::SurfaceInvalidInputException("Point out of range");
 		}
 
 		if ($Y < 0 || $Y > $this->GridSizeY) {
-			return; # Momchil TODO
-			#throw pException::SurfaceInvalidInputException("Point out of range");
+			throw pException::SurfaceInvalidInputException("Point out of range");
 		}
 
 		if ($Force) {
@@ -71,9 +65,11 @@ class pSurface
 	}
 
 	/* Write the X labels */
-	function writeXLabels(array $Format = [])
+	public function writeXLabels(array $Format = [])
 	{
-		$Color = $this->myPicture->FontColor;
+		$fontProperties = $this->myPicture->getFont();
+
+		$Color = $fontProperties['Color'];
 		$Angle = 0;
 		$Padding = 5;
 		$Position = LABEL_POSITION_TOP;
@@ -83,14 +79,17 @@ class pSurface
 		/* Override defaults */
 		extract($Format);
 
-		$X0 = $this->myPicture->GraphAreaX1;
-		$XSize = $this->myPicture->GraphAreaXdiff / ($this->GridSizeX + 1);
+		list($Xdiff, $Ydiff) = $this->myPicture->getGraphAreaDiffs();
+		$GraphAreaCoordinates = $this->myPicture->getGraphAreaCoordinates();
+
+		$X0 = $GraphAreaCoordinates["L"];
+		$XSize = $Xdiff / ($this->GridSizeX + 1);
 		$Settings = ["Angle" => $Angle,"Color" => $Color];
 		if ($Position == LABEL_POSITION_TOP) {
-			$YPos = $this->myPicture->GraphAreaY1 - $Padding;
+			$YPos = $GraphAreaCoordinates["T"] - $Padding;
 			$Settings["Align"] = ($Angle == 0) ? TEXT_ALIGN_BOTTOMMIDDLE : TEXT_ALIGN_MIDDLELEFT;
 		} elseif ($Position == LABEL_POSITION_BOTTOM) {
-			$YPos = $this->myPicture->GraphAreaY2 + $Padding;
+			$YPos = $GraphAreaCoordinates["B"] + $Padding;
 			$Settings["Align"] = ($Angle == 0) ? TEXT_ALIGN_TOPMIDDLE : TEXT_ALIGN_MIDDLERIGHT;
 		} else {
 			throw pException::SurfaceInvalidInputException("Invalid label position");
@@ -104,24 +103,29 @@ class pSurface
 	}
 
 	/* Write the Y labels */
-	function writeYLabels(array $Format = [])
+	public function writeYLabels(array $Format = [])
 	{
-		$Color = isset($Format["Color"]) ? $Format["Color"] : $this->myPicture->FontColor;
+		$fontProperties = $this->myPicture->getFont();
+
+		$Color = isset($Format["Color"]) ? $Format["Color"] : $fontProperties['Color'];
 		$Angle = isset($Format["Angle"]) ? $Format["Angle"] : 0;
 		$Padding = isset($Format["Padding"]) ? $Format["Padding"] : 5;
 		$Position = isset($Format["Position"]) ? $Format["Position"] : LABEL_POSITION_LEFT;
 		$Labels = isset($Format["Labels"]) ? $Format["Labels"] : [];
 		$CountOffset = isset($Format["CountOffset"]) ? $Format["CountOffset"] : 0;
 
-		$Y0 = $this->myPicture->GraphAreaY1;
-		$YSize = $this->myPicture->GraphAreaYdiff / ($this->GridSizeY + 1);
+		list($Xdiff, $Ydiff) = $this->myPicture->getGraphAreaDiffs();
+		$GraphAreaCoordinates = $this->myPicture->getGraphAreaCoordinates();
+
+		$Y0 = $GraphAreaCoordinates["T"];
+		$YSize = $Ydiff / ($this->GridSizeY + 1);
 		$Settings = ["Angle" => $Angle,"Color" => $Color];
 
 		if ($Position == LABEL_POSITION_LEFT) {
-			$XPos = $this->myPicture->GraphAreaX1 - $Padding;
+			$XPos = $GraphAreaCoordinates["L"] - $Padding;
 			$Settings["Align"] = TEXT_ALIGN_MIDDLERIGHT;
 		} elseif ($Position == LABEL_POSITION_RIGHT) {
-			$XPos = $this->myPicture->GraphAreaX2 + $Padding;
+			$XPos = $GraphAreaCoordinates["R"] + $Padding;
 			$Settings["Align"] = TEXT_ALIGN_MIDDLELEFT;
 		} else {
 			throw pException::SurfaceInvalidInputException("Invalid label position");
@@ -135,16 +139,19 @@ class pSurface
 	}
 
 	/* Draw the area around the specified Threshold */
-	function drawContour(int $Threshold, array $Format = [])
+	public function drawContour(int $Threshold, array $Format = [])
 	{
 		$Color = isset($Format["Color"]) ? $Format["Color"] : new pColor(0);
 		$Ticks = isset($Format["Ticks"]) ? $Format["Ticks"] : 3;
 		$Padding = isset($Format["Padding"]) ? $Format["Padding"] : 0;
 
-		$X0 = $this->myPicture->GraphAreaX1;
-		$Y0 = $this->myPicture->GraphAreaY1;
-		$XSize = $this->myPicture->GraphAreaXdiff / ($this->GridSizeX + 1);
-		$YSize = $this->myPicture->GraphAreaYdiff / ($this->GridSizeY + 1);
+		list($Xdiff, $Ydiff) = $this->myPicture->getGraphAreaDiffs();
+		$GraphAreaCoordinates = $this->myPicture->getGraphAreaCoordinates();
+
+		$X0 = $GraphAreaCoordinates["L"];
+		$Y0 = $GraphAreaCoordinates["T"];
+		$XSize = $Xdiff / ($this->GridSizeX + 1);
+		$YSize = $Ydiff / ($this->GridSizeY + 1);
 		$Settings = ["Color" => $Color,"Ticks" => $Ticks];
 		for ($X = 0; $X <= $this->GridSizeX; $X++) {
 			for ($Y = 0; $Y <= $this->GridSizeY; $Y++) {
@@ -172,7 +179,7 @@ class pSurface
 	}
 
 	/* Draw the surface chart */
-	function drawSurface(array $Format = [])
+	public function drawSurface(array $Format = [])
 	{
 		$Palette = isset($Format["Palette"]) ? $Format["Palette"] : [];
 		$ShadeColor1 = isset($Format["ShadeColor1"]) ? $Format["ShadeColor1"] : new pColor(77,205,21,40);
@@ -182,13 +189,16 @@ class pSurface
 		$Surrounding = isset($Format["Surrounding"]) ? $Format["Surrounding"] : NULL;
 		$Padding = isset($Format["Padding"]) ? $Format["Padding"] : 1;
 
-		$X0 = $this->myPicture->GraphAreaX1;
-		$Y0 = $this->myPicture->GraphAreaY1;
-		$XSize = $this->myPicture->GraphAreaXdiff / ($this->GridSizeX + 1);
-		$YSize = $this->myPicture->GraphAreaYdiff / ($this->GridSizeY + 1);
+		list($Xdiff, $Ydiff) = $this->myPicture->getGraphAreaDiffs();
+		$GraphAreaCoordinates = $this->myPicture->getGraphAreaCoordinates();
+
+		$X0 = $GraphAreaCoordinates["L"];
+		$Y0 = $GraphAreaCoordinates["T"];
+		$XSize = $Xdiff / ($this->GridSizeX + 1);
+		$YSize = $Ydiff / ($this->GridSizeY + 1);
 
 		$Gradient = new pColorGradient($ShadeColor1->newOne(), $ShadeColor2->newOne());
-		$Gradient->SetSegments(100);
+		$Gradient->setSegments(100);
 
 		for ($X = 0; $X <= $this->GridSizeX; $X++) {
 			for ($Y = 0; $Y <= $this->GridSizeY; $Y++) {
@@ -198,7 +208,7 @@ class pSurface
 					if (!empty($Palette)) {
 						$Settings = ["Color" => (isset($Palette[$Value])) ? $Palette[$Value] : new pColor(0)];
 					} else {
-						$Settings = ["Color" => $Gradient->Next($Value, TRUE)];
+						$Settings = ["Color" => $Gradient->getStep($Value)];
 					}
 
 					($Border) AND $Settings["BorderColor"] = $BorderColor;
@@ -217,7 +227,7 @@ class pSurface
 	}
 
 	/* Compute the missing points */
-	function computeMissing()
+	public function computeMissing()
 	{
 		$Missing = [];
 		for ($X = 0; $X <= $this->GridSizeX; $X++) {
@@ -253,7 +263,7 @@ class pSurface
 	}
 
 	/* Return the nearest Neighbor distance of a point */
-	function getNearestNeighbor($Xp, $Yp)
+	private function getNearestNeighbor($Xp, $Yp)
 	{
 		$Nearest = UNKNOWN;
 		for ($X = 0; $X <= $this->GridSizeX; $X++) {
@@ -272,5 +282,3 @@ class pSurface
 		return $Nearest;
 	}
 }
-
-?>

@@ -2,9 +2,9 @@
 /*
 pColorGradient - Data structure for gradient color
 
-Version     : 0.0.1
+Version     : 2.4.0-dev
 Made by     : Momchil Bozhinov
-Last Update : 01/01/2018
+Last Update : 14/10/2019
 
 */
 
@@ -12,74 +12,59 @@ namespace pChart;
 
 class pColorGradient
 {
-	var $StartColor;
-	var $EndColor;
-	var $ReturnColor;
-	var $OffsetR;
-	var $OffsetG;
-	var $OffsetB;
-	var $OffsetAlpha;
-	var $Step;
+	private $StartColor;
+	private $EndColor;
+	private $Offsets = NULL;
+	private $Segments;
 
-	function __construct(pColor $Start, pColor $End, $Radar = FALSE)
+	function __construct(pColor $Start, pColor $End)
 	{
 		$this->StartColor = $Start;
 		$this->EndColor = $End;
-		$this->ReturnColor = ($Radar) ? $Start->newOne() : $Start;
 	}
 
-	function SetSegments(int $Segments = 0)
+	private function getOffsets()
 	{
-		if ($Segments == 0){
-			$Segments = $this->Step;
+		list($eR, $eG, $eB, $eA) = $this->EndColor->get();
+		list($sR, $sG, $sB, $sA) = $this->StartColor->get();
+
+		return ["R" => ($eR - $sR), "G" => ($eG - $sG), "B" => ($eB - $sB), "Alpha" => ($eA - $sA)];
+	}
+
+	public function findStep()
+	{
+		$this->Offsets = $this->getOffsets();
+
+		list($oR, $oG, $oB, ) = array_values($this->Offsets);
+
+		return max(abs($oR), abs($oG), abs($oB), 1);
+	}
+
+	public function setSegments(int $Segments)
+	{
+		if (is_null($this->Offsets)){
+			$this->Offsets = $this->getOffsets();
 		}
-		$this->OffsetR = ($this->EndColor->R - $this->StartColor->R) / $Segments;
-		$this->OffsetG = ($this->EndColor->G - $this->StartColor->G) / $Segments;
-		$this->OffsetB = ($this->EndColor->B - $this->StartColor->B) / $Segments;
-		$this->OffsetAlpha = ($this->EndColor->Alpha - $this->StartColor->Alpha) / $Segments;
+		$this->Segments = $Segments;
 	}
 
-	/* pDraw uses default for $j */
-	/* pRadar passes an actual value */
-	function Next(int $j = 1, bool $doNotAccumulate = FALSE)
+	public function moveNext()
 	{
-		$R = $this->StartColor->R + $this->OffsetR * $j;
-		$G = $this->StartColor->G + $this->OffsetG * $j;
-		$B = $this->StartColor->B + $this->OffsetB * $j;
-		$Alpha = $this->StartColor->Alpha + $this->OffsetAlpha * $j;
-
-		($R < 0)	AND $R = 0;
-		($R > 255)	AND $R = 255;
-		($G < 0) 	AND $G = 0;
-		($G > 255) 	AND $G = 255;
-		($B < 0) 	AND $B = 0;
-		($B > 255) 	AND $B = 255;
-		($Alpha < 0) AND $Alpha = 0;
-		($Alpha > 100) AND $Alpha = 100;
-
-		if ($doNotAccumulate){
-			return new pColor($R,$G,$B,$Alpha);
-		} else {
-			$this->ReturnColor->R = $R;
-			$this->ReturnColor->G = $G;
-			$this->ReturnColor->B = $B;
-			$this->ReturnColor->Alpha = $Alpha;
-		}
+		$this->StartColor->Slide($this->Offsets, 1/$this->Segments);
 	}
 
-	function getLatest()
+	public function getStep(float $j = 1)
 	{
-		return $this->ReturnColor;
+		return $this->StartColor->newOne()->Slide($this->Offsets, abs($j)/$this->Segments);
 	}
 
-	function FindStep()
+	public function isGradient()
 	{
-		$this->Step = max(abs($this->EndColor->R - $this->StartColor->R), abs($this->EndColor->G - $this->StartColor->G), abs($this->EndColor->B - $this->StartColor->B));
-		($this->Step == 0) AND $this->Step = 1;
-
-		return $this->Step;
+		return ($this->StartColor != $this->EndColor);
 	}
 
+	public function getLatest()
+	{
+		return $this->StartColor;
+	}
 }
-
-?>

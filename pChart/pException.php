@@ -3,9 +3,9 @@
 /*
 pException - pChart core class
 
-Version     : 0.1
+Version     : 2.4.0-dev
 Made by     : Created by Momchil Bozhinov
-Last Update : 27/11/2017
+Last Update : 01/09/2019
 
 This file can be distributed under the license you can find at:
 http://www.pchart.net/license
@@ -16,8 +16,12 @@ namespace pChart;
 
 class pException extends \Exception
 {
-
 	public static function InvalidDimentions($text)
+	{
+		return new static(sprintf('pChart: %s', $text));
+	}
+
+	public static function InvalidCoordinates($text)
 	{
 		return new static(sprintf('pChart: %s', $text));
 	}
@@ -40,36 +44,6 @@ class pException extends \Exception
 	public static function InvalidResourcePath($text)
 	{
 		return new static(sprintf('pChart: %s', $text));
-	}
-
-	public static function ImageMapInvalidID($text)
-	{
-		return new static(sprintf('pChart: %s', $text));
-	}
-
-	public static function ImageMapSessionNotStarted()
-	{
-		return new static('ImageMapper: Yon need to start session before you can use the session storage');
-	}
-
-	public static function ImageMapInvalidSerieName($text)
-	{
-		return new static(sprintf('ImageMapper: The serie name "%s" was not found in the dataset', $text));
-	}
-
-	public static function ImageMapSQLiteException($text)
-	{
-		return new static(sprintf('ImageMapper: %s', $text));
-	}
-
-	public static function SQLiteException($text)
-	{
-		return new static(sprintf('pCache: %s', $text));
-	}
-
-	public static function CacheException($text)
-	{
-		return new static(sprintf('pCache: %s', $text));
 	}
 
 	public static function PieNoAbscissaException()
@@ -117,5 +91,3 @@ class pException extends \Exception
 		return new static(sprintf('pBubble: %s', $text));
 	}
 }
-
-?>

@@ -2,10 +2,10 @@
 /*
 pIndicator - class to draw indicators
 
-Version     : 2.3.0-dev
+Version     : 2.4.0-dev
 Made by     : Jean-Damien POGOLOTTI
 Maintainedby: Momchil Bozhinov
-Last Update : 01/02/2018
+Last Update : 01/09/2019
 
 This file can be distributed under the license you can find at:
 http://www.pchart.net/license
@@ -25,7 +25,7 @@ define("INDICATOR_VALUE_LABEL", 700022);
 /* pIndicator class definition */
 class pIndicator
 {
-	var $myPicture;
+	private $myPicture;
 
 	function __construct(\pChart\pDraw $pChartObject)
 	{
@@ -33,8 +33,10 @@ class pIndicator
 	}
 
 	/* Draw an indicator */
-	function draw(int $X, int $Y, int $Width, int $Height, array $Format = [])
+	public function draw(int $X, int $Y, int $Width, int $Height, array $Format = [])
 	{
+		$fontProperties = $this->myPicture->getFont();
+
 		/* No section */
 		if (isset($Format["IndicatorSections"])){
 			$IndicatorSections = $Format["IndicatorSections"];
@@ -54,10 +56,10 @@ class pIndicator
 		$CaptionColor = new pColor(255);
 		$SubCaptionColorFactor = NULL;
 		$SubCaptionColor = new pColor(50);
-		$FontName = $this->myPicture->FontName;
-		$FontSize = $this->myPicture->FontSize;
-		$CaptionFontName = $this->myPicture->FontName;
-		$CaptionFontSize = $this->myPicture->FontSize;
+		$FontName = $fontProperties['Name'];
+		$FontSize = $fontProperties['Size'];
+		$CaptionFontName = $fontProperties['Name'];
+		$CaptionFontSize = $fontProperties['Size'];
 		$Unit = "";
 
 		/* Override defaults */
@@ -71,12 +73,13 @@ class pIndicator
 			($Settings["Start"] < $OverallMin) AND $OverallMin = $Settings["Start"];
 		}
 
-		$RealWidth = $Width - (count($IndicatorSections) - 1) * $SectionsMargin;
+		$LastSection = count($IndicatorSections) - 1;
+		$RealWidth = $Width - $LastSection * $SectionsMargin;
 		$XScale = $RealWidth / ($OverallMax - $OverallMin);
 		$X1 = $X;
 		$ValuesPos = [];
-		$RestoreShadow = $this->myPicture->Shadow;
-		$this->myPicture->Shadow = FALSE;
+		$ShadowSpec = $this->myPicture->getShadow();
+		$this->myPicture->setShadow(FALSE);
 
 		foreach($IndicatorSections as $Key => $Settings) {
 			$Color = ["Color" => $Settings['Color']];
@@ -100,54 +103,51 @@ class pIndicator
 				}
 			}
 
-			if ($ValueDisplay == INDICATOR_VALUE_LABEL) {
-				if (empty($Break)){
-					$this->myPicture->drawFilledRectangle($X1, $Y, $X2, $Y + $Height, $Color);
-				} else {
-					sort($Break);
-					$Poly = [$X1, $Y];
-					$LastPointWritten = FALSE;
-					foreach($Break as $Value) {
+			if ($ValueDisplay == INDICATOR_VALUE_LABEL || empty($Break)) {
 
-						if ($Value - 5 >= $X1) {
-							$Poly[] = $Value - 5;
-							$Poly[] = $Y;
-						} elseif ($X1 - ($Value - 5) > 0) {
-							$Offset = $X1 - ($Value - 5);
-							$Poly = [$X1, $Y + $Offset];
-						}
+				sort($Break);
+				$Poly = [$X1, $Y];
+				$LastPointWritten = FALSE;
+				foreach($Break as $Value) {
 
-						$Poly[] = $Value;
-						$Poly[] = $Y + 5;
-
-						if ($Value + 5 <= $X2) {
-							$Poly[] = $Value + 5;
-							$Poly[] = $Y;
-						} elseif (($Value + 5) > $X2) {
-							$Offset = ($Value + 5) - $X2;
-							$Poly[] = $X2;
-							$Poly[] = $Y + $Offset;
-							$LastPointWritten = TRUE;
-						}
-					}
-
-					if (!$LastPointWritten) {
-						$Poly[] = $X2;
+					if ($Value - 5 >= $X1) {
+						$Poly[] = $Value - 5;
 						$Poly[] = $Y;
+					} elseif ($X1 - ($Value - 5) > 0) {
+						$Offset = $X1 - ($Value - 5);
+						$Poly = [$X1, $Y + $Offset];
 					}
 
-					$Poly[] = $X2;
-					$Poly[] = $Y + $Height;
-					$Poly[] = $X1;
-					$Poly[] = $Y + $Height;
-					$this->myPicture->drawPolygon($Poly, $Color);
+					$Poly[] = $Value;
+					$Poly[] = $Y + 5;
+
+					if ($Value + 5 <= $X2) {
+						$Poly[] = $Value + 5;
+						$Poly[] = $Y;
+					} elseif (($Value + 5) > $X2) {
+						$Offset = ($Value + 5) - $X2;
+						$Poly[] = $X2;
+						$Poly[] = $Y + $Offset;
+						$LastPointWritten = TRUE;
+					}
 				}
+
+				if (!$LastPointWritten) {
+					$Poly[] = $X2;
+					$Poly[] = $Y;
+				}
+
+				$Poly[] = $X2;
+				$Poly[] = $Y + $Height;
+				$Poly[] = $X1;
+				$Poly[] = $Y + $Height;
+				$this->myPicture->drawPolygon($Poly, $Color);
 
 			} else {
 				$this->myPicture->drawFilledRectangle($X1, $Y, $X2, $Y + $Height, $Color);
 			}
 
-			if ($Key == count($IndicatorSections) - 1 && $DrawRightHead) {
+			if ($Key == $LastSection && $DrawRightHead) {
 				$Poly = [$X2 + 1, $Y, $X2 + 1, $Y + $Height, $X2 + 1 + $HeadSize, $Y + ($Height / 2) ];
 				$this->myPicture->drawPolygon($Poly, $Color);
 				$this->myPicture->drawLine($X2 + 1, $Y, $X2 + 1 + $HeadSize, $Y + ($Height / 2), $Color);
@@ -200,9 +200,9 @@ class pIndicator
 							$Radius = floor(($TxtPos[1]["X"] - $TxtPos[0]["X"] + $TextPadding * 4) / 2);
 							$this->myPicture->drawFilledCircle($X1, $Y, $Radius + 4, ["Color" => $Settings["Color"]->newOne()->RGBChange(20)]);
 							$this->myPicture->drawFilledCircle($X1, $Y, $Radius, ["Color" => new pColor(255)]);
-							$this->myPicture->drawText($X1 - 1, $Y - 1, strval($Value) . $Unit, ["Align" => TEXT_ALIGN_MIDDLEMIDDLE,"FontName" => $FontName,"FontSize" => $FontSize]);
+							$this->myPicture->drawText($X1 + 1, $Y, strval($Value) . $Unit, ["Align" => TEXT_ALIGN_MIDDLEMIDDLE,"FontName" => $FontName,"FontSize" => $FontSize]);
 						} elseif ($ValueDisplay == INDICATOR_VALUE_LABEL) {
-							$this->myPicture->drawLabelBox(floor($X1), floor($Y) + 2, "Value - " . $Settings["Caption"], ["Format" => $Settings["Color"]->AlphaSet(100),"Caption" => strval($Value) . $Unit]);
+							$this->myPicture->drawLabelBox(floor($X1), floor($Y) + 2, "Value - " . $Settings["Caption"], ["Color" => $Settings["Color"]->newOne()->AlphaSet(100),"Caption" => strval($Value) . $Unit]);
 						}
 					}
 
@@ -211,8 +211,6 @@ class pIndicator
 			}
 		}
 
-		$this->myPicture->Shadow = $RestoreShadow;
+		$this->myPicture->restoreShadow($ShadowSpec);
 	}
 }
-
-?>
