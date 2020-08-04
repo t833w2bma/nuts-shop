@@ -1,9 +1,8 @@
-<?php session_start(); ?>
-<?php require './header.php'; ?>
-<?php require 'menu.php'; ?>
-<?php
-$pdo=new PDO('mysql:host=localhost;dbname=shop;charset=utf8', 
-	'staff', 'password');
+<?php session_start();  
+require_once './header.php';
+ require_once 'menu.php';
+	require_once 'connect.php'; 
+ 
 $purchase_id=1;
 foreach ($pdo->query('select max(id) from purchase') as $row) {
 	$purchase_id=$row['max(id)']+1;

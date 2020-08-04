@@ -22,14 +22,14 @@ if (isset($_REQUEST['keyword'])) {
 echo '<div class="products">';
 	foreach ($sql as $row) {
 		$id=$row['id'];
-		echo "<article class='product'>
+		?>
+		<article class='product'>
 			<a href='detail.php?id=$id'>
-				<div class='img'><img src='image/$id.jpg'></div>
-				<div class='detail'><span> {$row['name']} </span>
-					<br> <span> {$row['price']}円</span>
+				<div class='img'><img src='image/<?=$id?>.jpg'></div>
+				<div class='detail'><span> <?=$row['name']?> </span>
+					<br> <span> <?=$row['price']?>円</span>
 				</div>	
-			</a></article>";
-	}
-	?>
+			</a></article>
+<?php	} 	?>
 </div> <!--product-->
 <?php require './footer.php'; ?>

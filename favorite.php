@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+
 if (isset($_SESSION['customer'])) {
 	echo '<table>';
 	echo '<th>商品番号</th><th>商品名</th><th>価格</th>';

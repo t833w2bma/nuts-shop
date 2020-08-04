@@ -1,8 +1,8 @@
 <?php 
 session_start(); 
-require './header.php';
- require 'menu.php';
-	require 'connect.php'; 
+require_once './header.php';
+ require_once 'menu.php';
+	require_once 'connect.php'; 
  
 if (isset($_SESSION['customer']['id'])) {
 	$id=$_SESSION['customer']['id'];
@@ -14,12 +14,27 @@ if (isset($_SESSION['customer']['id'])) {
 }
 
 
-if (empty($sql->fetchAll())) {  //重複したログイン名はない
+if ( !empty($sql->fetchAll()) ) {  //重複したログイン名はない & トークンが等しい
+		echo 'ログイン名がすでに使用されていますので、変更してください。';
+		exit;
+	}
+
+if( $_SESSION['token'] != $_POST['token']
+|| empty($_POST['name']) || empty($_POST['address'])
+|| empty($_POST['password'])){ 
+	echo '必須事項がありません｡';
+	exit;
+}
+	
+if( $_POST['password'] != $_POST['password-confirm']){
+	echo 'パスワードが一致しません｡';
+	exit;
+}
+
 	// パスワードをハッシュ化する
 	$pswd = password_hash($_REQUEST['password'], PASSWORD_DEFAULT);
 
-
-	if (isset($_SESSION['customer']['name'],$_SESSION['customer']['address'],$_SESSION['customer']['login'],$_SESSION['customer']['name'])) {
+	if (isset($id) && isset($_SESSION['customer']['name'],$_SESSION['customer']['address'],$_SESSION['customer']['login'],$_SESSION['customer']['name'])) {
 	// ログインセッションがあったら更新処理
 		$sql=$pdo->prepare('update customer set name=?, address=?, '.
 			'login=?, password=? where id=?');
@@ -34,6 +49,7 @@ if (empty($sql->fetchAll())) {  //重複したログイン名はない
 			'address'=>$_REQUEST['address'], 'login'=>$_REQUEST['login']];
 			// ,'password'=>$pswd  パスワードは保存しなくていい
 		echo 'お客様情報を更新しました。';
+
 	} else {
 // なかったら DBに新規追加する
 		$sql=$pdo->prepare('insert into customer values(null,?,?,?,?,?)');
@@ -49,8 +65,6 @@ if (empty($sql->fetchAll())) {  //重複したログイン名はない
 		$_SESSION['customer']['login']=$_REQUEST['login'];
 
 	}
-} else {
-	echo 'ログイン名がすでに使用されていますので、変更してください。';
-}
+
 ?>
 <?php require '../footer.php'; ?>

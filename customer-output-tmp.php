@@ -26,7 +26,7 @@ mb_internal_encoding("UTF-8");
 //メールの情報を設定
 $mailto = $_POST['email'];
 $title = "shopからメール認証のURL";
-$message = 'http://'.$_SERVER['HTTP_HOST']."/chap7/customer-input.php?token=".$token.'&email='.$_POST['email'];
+$message = 'http://'.$_SERVER['HTTP_HOST']."/shop/customer-input.php?token=".$token.'&email='.$_POST['email'];
 $option= "From:".mb_encode_mimeheader("送信者2")."<test2@example.com>";
 
 //メールの送信

@@ -1,5 +1,5 @@
 <nav class="memnunav">
-<a href="index-product.php">商品</a>
+<a href="index.php">商品</a>
 <a href="cart-show.php">カート</a>
 <a href="purchase-input.php">購入</a>
 <?php
