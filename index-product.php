@@ -1,34 +1,39 @@
+<script src="https://kit.fontawesome.com/f4e704525f.js" crossorigin="anonymous"></script>
 <?php 
  require '../header.php'; 
  require 'menu.php';
  require 'connect.php'; 
 ?>
+
+<i class="fab fa-500px"></i>
 <form action="product.php" method="post">
 商品検索
 <input type="text" name="keyword">
 <input type="submit" value="検索">
 </form>
 <hr>
+<div class="container">
+	<div class="row">
+
 <?php
-echo '<table>';
-echo '<th>商品番号</th><th>商品名</th><th>価格</th>';
-if (isset($_REQUEST['keyword'])) {
-	$sql=$pdo->prepare('select * from product where name like ?');
-	$sql->execute(['%'.$_REQUEST['keyword'].'%']);
-} else {
-	$sql=$pdo->prepare('select * from product');
-	$sql->execute([]);
-}
-foreach ($sql as $row) {
-	$id=$row['id'];
-	echo '<tr>';
-	echo '<td>', $id, '</td>';
-	echo '<td>';
-	echo '<a href="detail.php?id=', $id, '">', $row['name'], '</a>';
-	echo '</td>';
-	echo '<td>', $row['price'], '</td>';
-	echo '</tr>';
-}
-echo '</table>';
-?>
+	if (isset($_REQUEST['keyword'])) {
+		$sql=$pdo->prepare('select * from product where name like ?');
+		$sql->execute(['%'.$_REQUEST['keyword'].'%']);
+	} else {
+		$sql=$pdo->prepare('select * from product');
+		$sql->execute([]);
+		}
+	foreach ($sql as $row) {
+		$id=$row['id'];
+	?>	
+
+		<article class="col-sm-6 col-md-4 col-lg-3 product"><a href="detail.php?id=<?=$id?>">
+			<img src="image/<?=$id?>.jpg">
+			 <p> <?=$row['name']?> </p>
+			<strong><?= $row['price']?> </strong>
+		</a></article>
+
+<?php	} ?>
+	</div>
+</div>
 <?php require '../footer.php'; ?>

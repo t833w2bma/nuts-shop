@@ -4,4 +4,3 @@
 <?php
 require 'favorite.php';
 ?>
-<?php require '../footer.php'; ?>

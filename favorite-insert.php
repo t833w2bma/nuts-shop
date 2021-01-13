@@ -14,4 +14,3 @@ if (isset($_SESSION['customer'])) {
 	echo 'お気に入りに商品を追加するには、ログインしてください。';
 }
 ?>
-<?php require '../footer.php'; ?>

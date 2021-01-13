@@ -1,7 +1,7 @@
 <?php
   $dbname = "shop"; 
   $host = 'localhost';
-  $user = 'staff';
+  $user = 'ginzo';
   $psw =  'Wert3333-';
     $mydb = 'mysql:dbname='.$dbname.';host='.$host.';charset=utf8';
   try{
